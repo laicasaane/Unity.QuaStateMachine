@@ -1,2 +1,3 @@
-# Unity.QuaStateMachine
-Easy to implement state machine framework.
+﻿# Unity.QuaStateMachine
+
+A Unity package for [QuaStateMachine](https://github.com/qua11q7/QuaStateMachine) which also contains many improvements.
