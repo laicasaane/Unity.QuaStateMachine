@@ -51,9 +51,16 @@ namespace QuaStateMachine
         }
 
         public Transition<TState, TTransition, TSignal> StartWhen(
-            Func<bool> callback)
+            Func<bool> condition)
         {
-            AddStartCondition(new TransitionCondition(callback));
+            AddStartCondition(new TransitionCondition(condition));
+            return this;
+        }
+
+        public Transition<TState, TTransition, TSignal> StartWhen(
+            Predicate<ITransition> condition)
+        {
+            AddStartCondition(new ParamTransitionCondition(condition));
             return this;
         }
 
@@ -72,9 +79,16 @@ namespace QuaStateMachine
         }
 
         public Transition<TState, TTransition, TSignal> FinishWhen(
-            Func<bool> callback)
+            Func<bool> condition)
         {
-            AddFinishCondition(new TransitionCondition(callback));
+            AddFinishCondition(new TransitionCondition(condition));
+            return this;
+        }
+
+        public Transition<TState, TTransition, TSignal> FinishWhen(
+            Predicate<ITransition> condition)
+        {
+            AddFinishCondition(new ParamTransitionCondition(condition));
             return this;
         }
 

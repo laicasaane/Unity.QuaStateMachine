@@ -13,14 +13,11 @@ namespace QuaStateMachine
         public IReadOnlyList<Transition<TState, TTransition, TSignal>> SignalTo
             => this.SignalToI;
 
-        public IReadOnlyList<SignalCondition<TState, TTransition, TSignal>> EmitConditions
-            => this.EmitConditionsI;
-
-        public IReadOnlyDictionary<SignalCondition<TState, TTransition, TSignal>, Transition<TState, TTransition, TSignal>> TransitionConditions
-            => this.TransitionConditionsI;
-
         public override IReadOnlyList<ISignalAction> Actions
             => this.actions;
+
+        public IReadOnlyDictionary<ISignalCondition, Transition<TState, TTransition, TSignal>> TransitionConditions
+            => this.TransitionConditionsI;
 
         /// <summary>
         /// Internal <see cref="Machine"/>
@@ -35,23 +32,24 @@ namespace QuaStateMachine
         /// <summary>
         /// Internal <see cref="EmitConditions"/>
         /// </summary>
-        internal List<SignalCondition<TState, TTransition, TSignal>> EmitConditionsI { get; }
+        internal List<ISignalCondition> EmitConditionsI { get; }
 
         /// <summary>
         /// Internal <see cref="TransitionConditions"/>
         /// </summary>
-        internal Dictionary<SignalCondition<TState, TTransition, TSignal>, Transition<TState, TTransition, TSignal>> TransitionConditionsI { get; }
+        internal Dictionary<ISignalCondition, Transition<TState, TTransition, TSignal>> TransitionConditionsI { get; }
 
         private readonly SignalActionList actions;
+        private readonly List<ISignalCondition> failedConditions;
 
         internal Signal(StateMachine<TState, TTransition, TSignal> machine, TSignal name) : base(name)
         {
             this.MachineI = machine;
             this.SignalToI = new List<Transition<TState, TTransition, TSignal>>();
-            this.EmitConditionsI = new List<SignalCondition<TState, TTransition, TSignal>>();
-            this.TransitionConditionsI = new Dictionary<SignalCondition<TState, TTransition, TSignal>,
-                                                        Transition<TState, TTransition, TSignal>>();
+            this.EmitConditionsI = new List<ISignalCondition>();
+            this.TransitionConditionsI = new Dictionary<ISignalCondition, Transition<TState, TTransition, TSignal>>();
             this.actions = new SignalActionList();
+            this.failedConditions = new List<ISignalCondition>();
         }
 
         public override bool AddAction(ISignalAction action)
@@ -80,6 +78,7 @@ namespace QuaStateMachine
 
         public override void Emit()
         {
+            this.failedConditions.Clear();
             this.actions.Emit();
 
             #region Emit Conditions Check
@@ -87,18 +86,24 @@ namespace QuaStateMachine
             // This allows to make OR logical comparisons between SignalEmitConditions.
             var emitConditionMet = this.EmitConditionsI.Count <= 0;
 
-            foreach (var signalCondition in this.EmitConditionsI)
+            if (!emitConditionMet)
             {
-                if (signalCondition.IsValid)
+                foreach (var signalCondition in this.EmitConditionsI)
                 {
-                    emitConditionMet = true;
+                    if (signalCondition.Validate(this))
+                    {
+                        emitConditionMet = true;
+                    }
+                    else
+                    {
+                        this.failedConditions.Add(signalCondition);
+                    }
                 }
             }
 
             if (!emitConditionMet)
             {
-                var failedConditions = this.EmitConditionsI.ToList<ISignalCondition>();
-                var args = new SignalNotProcessedArgs(SignalFailure.EmitConditionsNotMet, failedConditions);
+                var args = new SignalNotProcessedArgs(SignalFailure.EmitConditionsNotMet, this.failedConditions.ToArray());
                 this.actions.NotProcess(args);
 
                 return;
@@ -108,34 +113,33 @@ namespace QuaStateMachine
             #region Transition Conditions Check
             // check transition conditions, there must be only one valid transition.
             // If more than one, stop emitting the signal, otherwise this might cause undefined behaviour.
-            var conditionMetCount = this.TransitionConditionsI.Count != 0 ? 0 : 1;
+            var transitionConditionMetCount = this.TransitionConditionsI.Count != 0 ? 0 : 1;
 
             foreach (var kv in this.TransitionConditionsI)
             {
-                if (kv.Key.IsValid)
+                if (kv.Key.Validate(this))
                 {
                     kv.Value.CanTransitionI = true;
-                    conditionMetCount++;
+                    transitionConditionMetCount++;
                 }
                 else
                 {
                     kv.Value.CanTransitionI = false;
+                    this.failedConditions.Add(kv.Key);
                 }
             }
 
-            if (conditionMetCount == 0)
+            if (transitionConditionMetCount == 0)
             {
-                var failedConditions = this.TransitionConditionsI.Keys.ToList<ISignalCondition>();
-                var args = new SignalNotProcessedArgs(SignalFailure.TransitionConditionsNotMet, failedConditions);
+                var args = new SignalNotProcessedArgs(SignalFailure.TransitionConditionsNotMet, this.failedConditions.ToArray());
                 this.actions.NotProcess(args);
 
                 return;
             }
 
-            if (conditionMetCount > 1)
+            if (transitionConditionMetCount > 1)
             {
-                var failedConditions = this.TransitionConditionsI.Keys.ToList<ISignalCondition>();
-                var args = new SignalNotProcessedArgs(SignalFailure.TransitionAmbiguity, failedConditions);
+                var args = new SignalNotProcessedArgs(SignalFailure.TransitionAmbiguity, this.failedConditions.ToArray());
                 this.actions.NotProcess(args);
 
                 return;
@@ -172,19 +176,20 @@ namespace QuaStateMachine
             return true;
         }
 
-        internal void AddEmitCondition(SignalCondition<TState, TTransition, TSignal> condition)
+        internal void AddEmitCondition(ISignalCondition condition)
         {
-            this.EmitConditionsI.Add(condition);
+            if (!this.EmitConditionsI.Contains(condition))
+                this.EmitConditionsI.Add(condition);
         }
 
-        internal void AddTransitionCondition(SignalCondition<TState, TTransition, TSignal> condition, Transition<TState, TTransition, TSignal> transition)
+        internal void AddTransitionCondition(ISignalCondition condition, Transition<TState, TTransition, TSignal> transition)
         {
             if (condition == null || transition == null || !this.SignalToI.Exists(t => t.Name.Equals(transition.Name)))
             {
                 return;
             }
 
-            this.TransitionConditionsI.Add(condition, transition);
+            this.TransitionConditionsI[condition] = transition;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -201,6 +206,6 @@ namespace QuaStateMachine
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected override IReadOnlyDictionary<ISignalCondition, ITransition> GetTransitionConditions()
-            => this.TransitionConditionsI.ToDictionary(x => x.Key as ISignalCondition, x => x.Value as ITransition);
+            => this.TransitionConditionsI.ToDictionary(x => x.Key, x => x.Value as ITransition);
     }
 }

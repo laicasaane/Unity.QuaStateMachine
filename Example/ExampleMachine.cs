@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace QuaStateMachine.Examples
@@ -7,91 +8,94 @@ namespace QuaStateMachine.Examples
     using Transition = Transition<string, StateDirection<string>, string>;
     using Signal = Signal<string, StateDirection<string>, string>;
 
+    public static class MainState
+    {
+        public const string A = nameof(A);
+        public const string B = nameof(B);
+        public const string C = nameof(C);
+        public const string D = nameof(D);
+        public const string E = nameof(E);
+    }
+
+    public static class BSubState
+    {
+        public const string B1 = nameof(B1);
+        public const string B2 = nameof(B2);
+        public const string B3 = nameof(B3);
+    }
+
+    public static class B2SubState
+    {
+        public const string B21 = nameof(B21);
+        public const string B22 = nameof(B22);
+        public const string B23 = nameof(B23);
+    }
+
     public static class ExampleMachine
     {
-        private static class MainState
-        {
-            public const string A = nameof(A);
-            public const string B = nameof(B);
-            public const string C = nameof(C);
-            public const string D = nameof(D);
-            public const string E = nameof(E);
-        }
-
-        private static class BSubState
-        {
-            public const string B1 = nameof(B1);
-            public const string B2 = nameof(B2);
-            public const string B3 = nameof(B3);
-        }
-
-        private static class B2SubState
-        {
-            public const string B21 = nameof(B21);
-            public const string B22 = nameof(B22);
-            public const string B23 = nameof(B23);
-        }
-
         private static class MainStates
         {
-            public static State A;
-            public static State B;
-            public static State C;
-            public static State D;
-            public static State E;
+            public static State<string, StateDirection<string>, string> A;
+            public static State<string, StateDirection<string>, string> B;
+            public static State<string, StateDirection<string>, string> C;
+            public static State<string, StateDirection<string>, string> D;
+            public static State<string, StateDirection<string>, string> E;
         }
 
         private static class MainTransitions
         {
-            public static Transition A_B;
-            public static Transition B_C;
-            public static Transition B_D;
-            public static Transition C_E;
-            public static Transition D_E;
+            public static Transition<string, StateDirection<string>, string> A_B;
+            public static Transition<string, StateDirection<string>, string> B_C;
+            public static Transition<string, StateDirection<string>, string> B_D;
+            public static Transition<string, StateDirection<string>, string> C_E;
+            public static Transition<string, StateDirection<string>, string> D_E;
+            public static Transition<string, StateDirection<string>, string> E_A;
         }
 
         private static class MainSignals
         {
-            public static Signal A_B;
-            public static Signal B_C;
-            public static Signal B_D;
-            public static Signal C_E;
-            public static Signal D_E;
+            public static Signal<string, StateDirection<string>, string> A_B;
+            public static Signal<string, StateDirection<string>, string> B_C;
+            public static Signal<string, StateDirection<string>, string> B_D;
+            public static Signal<string, StateDirection<string>, string> C_E;
+            public static Signal<string, StateDirection<string>, string> D_E;
+            public static Signal<string, StateDirection<string>, string> E_A;
         }
 
         private static class BSubStates
         {
-            public static State B1;
-            public static State B2;
-            public static State B3;
+            public static State<string, StateDirection<string>, string> B1;
+            public static State<string, StateDirection<string>, string> B2;
         }
 
         private static class BSubTransitions
         {
-            public static Transition B1_B2;
-            public static Transition B2_B3;
+            public static Transition<string, StateDirection<string>, string> B1_B2;
+            public static Transition<string, StateDirection<string>, string> B2_B1;
         }
 
         private static class BSubSignals
         {
-            public static Signal B1_B2;
-            public static Signal B2_B3;
+            public static Signal<string, StateDirection<string>, string> B1_B2;
+            public static Signal<string, StateDirection<string>, string> B2_B1;
         }
 
         private static class B2SubStates
         {
-            public static State B21;
-            public static State B22;
+            public static State<string, StateDirection<string>, string> B21;
+            public static State<string, StateDirection<string>, string> B22;
         }
 
         private static class B2SubTransitions
         {
-            public static Transition B21_B22;
+            public static Transition<string, StateDirection<string>, string> B21_B22;
+            public static Transition<string, StateDirection<string>, string> B22_B21;
         }
 
         private static class B2SubSignals
         {
-            public static Signal B21_B22;
+            public static Signal<string, StateDirection<string>, string> B21_B22;
+            public static Signal<string, StateDirection<string>, string> B22_B21;
         }
 
         public static void CreateStates(StateMachine machine)
@@ -115,6 +119,7 @@ namespace QuaStateMachine.Examples
                 .Create(MainStates.B.To(MainStates.D), out MainTransitions.B_D)
                 .Create(MainStates.C.To(MainStates.E), out MainTransitions.C_E)
                 .Create(MainStates.D.To(MainStates.E), out MainTransitions.D_E)
+                .Create(MainStates.E.To(MainStates.A), out MainTransitions.E_A)
             ;
         }
 
@@ -126,6 +131,7 @@ namespace QuaStateMachine.Examples
                 .Create(MainTransitions.B_D, out MainSignals.B_D)
                 .Create(MainTransitions.C_E, out MainSignals.C_E)
                 .Create(MainTransitions.D_E, out MainSignals.D_E)
+                .Create(MainTransitions.E_A, out MainSignals.E_A)
             ;
         }
 
@@ -134,7 +140,6 @@ namespace QuaStateMachine.Examples
             machine
                 .Create(BSubState.B1, out BSubStates.B1, MainStates.B)
                 .Create(BSubState.B2, out BSubStates.B2, MainStates.B)
-                .Create(BSubState.B3, out BSubStates.B3, MainStates.B)
 
                 .Initial(BSubState.B1, MainStates.B)
             ;
@@ -144,7 +149,7 @@ namespace QuaStateMachine.Examples
         {
             machine
                 .Create(BSubStates.B1.To(BSubStates.B2), out BSubTransitions.B1_B2)
-                .Create(BSubStates.B2.To(BSubStates.B3), out BSubTransitions.B2_B3)
+                .Create(BSubStates.B2.To(BSubStates.B1), out BSubTransitions.B2_B1)
             ;
         }
 
@@ -152,7 +157,7 @@ namespace QuaStateMachine.Examples
         {
             machine
                 .Create(BSubTransitions.B1_B2, out BSubSignals.B1_B2)
-                .Create(BSubTransitions.B2_B3, out BSubSignals.B2_B3)
+                .Create(BSubTransitions.B2_B1, out BSubSignals.B2_B1)
             ;
         }
 
@@ -170,6 +175,7 @@ namespace QuaStateMachine.Examples
         {
             machine
                 .Create(B2SubStates.B21.To(B2SubStates.B22), out B2SubTransitions.B21_B22)
+                .Create(B2SubStates.B22.To(B2SubStates.B21), out B2SubTransitions.B22_B21)
             ;
         }
 
@@ -177,6 +183,7 @@ namespace QuaStateMachine.Examples
         {
             machine
                 .Create(B2SubTransitions.B21_B22, out B2SubSignals.B21_B22)
+                .Create(B2SubTransitions.B22_B21, out B2SubSignals.B22_B21)
             ;
         }
 
@@ -195,29 +202,29 @@ namespace QuaStateMachine.Examples
             machine
                 .Begin(MainStates.A)
                     .On(new NextStateAction(MainSignals.A_B))
-                    .OnEnterComplete(example.UpdateStateName)
-                    .OnTick(example.UpdateStateTime)
+                    .OnEnterComplete(example.UpdateMainStateName)
+                    .OnTick(example.UpdateMainStateTime)
                 .End()
                 .Begin(MainStates.B)
                     .On(new BranchedStateAction((KeyCode.C, MainSignals.B_C),
                                                 (KeyCode.D, MainSignals.B_D)))
-                    .OnEnterComplete(example.UpdateStateName)
-                    .OnTick(example.UpdateStateTime)
+                    .OnEnterComplete(example.UpdateMainStateName)
+                    .OnTick(example.UpdateMainStateTime)
                 .End()
                 .Begin(MainStates.C)
                     .On(new NextStateAction(MainSignals.C_E))
-                    .OnEnterComplete(example.UpdateStateName)
-                    .OnTick(example.UpdateStateTime)
+                    .OnEnterComplete(example.UpdateMainStateName)
+                    .OnTick(example.UpdateMainStateTime)
                 .End()
                 .Begin(MainStates.D)
                     .On(new NextStateAction(MainSignals.D_E))
-                    .OnEnterComplete(example.UpdateStateName)
-                    .OnTick(example.UpdateStateTime)
+                    .OnEnterComplete(example.UpdateMainStateName)
+                    .OnTick(example.UpdateMainStateTime)
                 .End()
                 .Begin(MainStates.E)
-                    .On(new DefaultStateAction())
-                    .OnEnterComplete(example.UpdateStateName)
-                    .OnTick(example.UpdateStateTime)
+                    .On(new NextStateAction(MainSignals.E_A))
+                    .OnEnterComplete(example.UpdateMainStateName)
+                    .OnTick(example.UpdateMainStateTime)
                 .End()
             ;
         }
@@ -226,34 +233,40 @@ namespace QuaStateMachine.Examples
         {
             machine
                 .Begin(MainTransitions.A_B)
-                    .OnStart(example.UpdateTransitionName)
-                    .OnFinish(example.RemoveTransitionName)
-                    .OnTick(example.UpdateTransitionTime)
-                    .FinishWhen(new DelayedTransitionCondition(1f))
+                    .OnStart(example.UpdateMainTransitionName)
+                    .OnFinish(example.RemoveMainTransitionName)
+                    .OnTick(example.UpdateMainTransitionTime)
+                    .FinishWhen(new DelayedTransitionCondition(1f, example.OnInvalidateTransition))
                 .End()
                 .Begin(MainTransitions.B_C)
-                    .OnStart(example.UpdateTransitionName)
-                    .OnFinish(example.RemoveTransitionName)
-                    .OnTick(example.UpdateTransitionTime)
-                    .FinishWhen(new DelayedTransitionCondition(1f))
+                    .OnStart(example.UpdateMainTransitionName)
+                    .OnFinish(example.RemoveMainTransitionName)
+                    .OnTick(example.UpdateMainTransitionTime)
+                    .FinishWhen(new DelayedTransitionCondition(1f, example.OnInvalidateTransition))
                 .End()
                 .Begin(MainTransitions.B_D)
-                    .OnStart(example.UpdateTransitionName)
-                    .OnFinish(example.RemoveTransitionName)
-                    .OnTick(example.UpdateTransitionTime)
-                    .FinishWhen(new DelayedTransitionCondition(1f))
+                    .OnStart(example.UpdateMainTransitionName)
+                    .OnFinish(example.RemoveMainTransitionName)
+                    .OnTick(example.UpdateMainTransitionTime)
+                    .FinishWhen(new DelayedTransitionCondition(1f, example.OnInvalidateTransition))
                 .End()
                 .Begin(MainTransitions.C_E)
-                    .OnStart(example.UpdateTransitionName)
-                    .OnFinish(example.RemoveTransitionName)
-                    .OnTick(example.UpdateTransitionTime)
-                    .FinishWhen(new DelayedTransitionCondition(1f))
+                    .OnStart(example.UpdateMainTransitionName)
+                    .OnFinish(example.RemoveMainTransitionName)
+                    .OnTick(example.UpdateMainTransitionTime)
+                    .FinishWhen(new DelayedTransitionCondition(1f, example.OnInvalidateTransition))
                 .End()
                 .Begin(MainTransitions.D_E)
-                    .OnStart(example.UpdateTransitionName)
-                    .OnFinish(example.RemoveTransitionName)
-                    .OnTick(example.UpdateTransitionTime)
-                    .FinishWhen(new DelayedTransitionCondition(1f))
+                    .OnStart(example.UpdateMainTransitionName)
+                    .OnFinish(example.RemoveMainTransitionName)
+                    .OnTick(example.UpdateMainTransitionTime)
+                    .FinishWhen(new DelayedTransitionCondition(1f, example.OnInvalidateTransition))
+                .End()
+                .Begin(MainTransitions.E_A)
+                    .OnStart(example.UpdateMainTransitionName)
+                    .OnFinish(example.RemoveMainTransitionName)
+                    .OnTick(example.UpdateMainTransitionTime)
+                    .FinishWhen(new DelayedTransitionCondition(1f, example.OnInvalidateTransition))
                 .End()
             ;
         }
@@ -343,10 +356,10 @@ namespace QuaStateMachine.Examples
 
     public class NextStateAction : DefaultStateAction
     {
-        private readonly Signal nextStateSignal;
+        private readonly Signal<string, StateDirection<string>, string> nextStateSignal;
         private readonly KeyCode nextStateKey;
 
-        public NextStateAction(Signal nextStateSignal, KeyCode? nextStateKey = null)
+        public NextStateAction(Signal<string, StateDirection<string>, string> nextStateSignal, KeyCode? nextStateKey = null)
         {
             this.nextStateSignal = nextStateSignal;
             this.nextStateKey = nextStateKey ?? KeyCode.Space;
@@ -361,9 +374,9 @@ namespace QuaStateMachine.Examples
 
     public class BranchedStateAction : DefaultStateAction
     {
-        private readonly Dictionary<KeyCode, Signal> signalMap = new Dictionary<KeyCode, Signal>();
+        private readonly Dictionary<KeyCode, Signal<string, StateDirection<string>, string>> signalMap = new Dictionary<KeyCode, Signal<string, StateDirection<string>, string>>();
 
-        public BranchedStateAction(params (KeyCode key, Signal signal)[] args)
+        public BranchedStateAction(params (KeyCode key, Signal<string, StateDirection<string>, string> signal)[] args)
         {
             foreach (var (key, signal) in args)
             {
@@ -384,17 +397,26 @@ namespace QuaStateMachine.Examples
     public class DelayedTransitionCondition : ITransitionCondition
     {
         private readonly float delay;
+        private readonly Action<ITransition> onInvalidate;
+
         private float elapsed;
 
-        public DelayedTransitionCondition(float delay)
+        public DelayedTransitionCondition(float delay, Action<ITransition> onInvalidate)
         {
             this.delay = delay;
+            this.onInvalidate = onInvalidate;
         }
 
-        bool ITransitionCondition.Validate()
+        bool ITransitionCondition.Validate(ITransition transition)
         {
             this.elapsed += Time.deltaTime;
             return this.elapsed >= this.delay;
+        }
+
+        void ITransitionCondition.Invalidate(ITransition transition)
+        {
+            this.elapsed = 0f;
+            this.onInvalidate(transition);
         }
     }
 }

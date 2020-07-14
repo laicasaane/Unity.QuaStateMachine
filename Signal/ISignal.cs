@@ -32,8 +32,6 @@ namespace QuaStateMachine
 
         new IReadOnlyList<Transition<TState, TTransition, TSignal>> SignalTo { get; }
 
-        new IReadOnlyList<SignalCondition<TState, TTransition, TSignal>> EmitConditions { get; }
-
-        new IReadOnlyDictionary<SignalCondition<TState, TTransition, TSignal>, Transition<TState, TTransition, TSignal>> TransitionConditions { get; }
+        new IReadOnlyDictionary<ISignalCondition, Transition<TState, TTransition, TSignal>> TransitionConditions { get; }
     }
 }

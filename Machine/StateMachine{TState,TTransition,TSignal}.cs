@@ -476,9 +476,20 @@ namespace QuaStateMachine
                 }
             }
 
-            var signalCondition = new SignalCondition<TState, TTransition, TSignal>();
+            var signalCondition = new StateSignalCondition<TState, TTransition, TSignal>();
             signalCondition.AddCondition(conditionalStates);
             signal.AddEmitCondition(signalCondition);
+            return true;
+        }
+
+        public bool CreateEmitCondition(Signal<TState, TTransition, TSignal> signal, ISignalCondition condition)
+        {
+            if (signal == null || !this.SignalMapI.ContainsKey(signal.Name))
+            {
+                return false;
+            }
+
+            signal.AddEmitCondition(condition);
             return true;
         }
 
@@ -557,9 +568,46 @@ namespace QuaStateMachine
                 }
             }
 
-            var signalCondition = new SignalCondition<TState, TTransition, TSignal>();
+            var signalCondition = new StateSignalCondition<TState, TTransition, TSignal>();
             signalCondition.AddCondition(conditionalStates);
             signal.AddTransitionCondition(signalCondition, transition);
+            return true;
+        }
+
+        public bool CreateTransitionCondition(TSignal signalName, TTransition transitionName, ISignalCondition condition)
+        {
+            if (!this.SignalMapI.ContainsKey(signalName) ||
+                !this.TransitionMapI.ContainsKey(transitionName))
+            {
+                return false;
+            }
+
+            var signal = this.SignalMapI[signalName];
+            var transition = this.TransitionMapI[transitionName];
+            return CreateTransitionCondition(signal, transition, condition);
+        }
+
+        public bool CreateTransitionCondition(Signal<TState, TTransition, TSignal> signal, TTransition transitionName, ISignalCondition condition)
+        {
+            if (signal == null || !this.SignalMapI.ContainsKey(signal.Name) ||
+                !this.TransitionMapI.ContainsKey(transitionName))
+            {
+                return false;
+            }
+
+            var transition = this.TransitionMapI[transitionName];
+            return CreateTransitionCondition(signal, transition, condition);
+        }
+
+        public bool CreateTransitionCondition(Signal<TState, TTransition, TSignal> signal, Transition<TState, TTransition, TSignal> transition, ISignalCondition condition)
+        {
+            if (signal == null || !this.SignalMapI.ContainsKey(signal.Name) ||
+                transition == null || !this.TransitionMapI.ContainsKey(transition.Name))
+            {
+                return false;
+            }
+
+            signal.AddTransitionCondition(condition, transition);
             return true;
         }
 

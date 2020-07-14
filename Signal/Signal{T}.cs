@@ -20,7 +20,7 @@ namespace QuaStateMachine
         IReadOnlyList<ITransition> ISignal.SignalTo
             => GetSignalTo();
 
-        IReadOnlyList<ISignalCondition> ISignal.EmitConditions
+        public IReadOnlyList<ISignalCondition> EmitConditions
             => GetEmitConditions();
 
         IReadOnlyDictionary<ISignalCondition, ITransition> ISignal.TransitionConditions

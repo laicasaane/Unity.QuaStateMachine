@@ -242,9 +242,9 @@ namespace QuaStateMachine
 
             public override void Tick()
             {
-                if (this.transition.startConditions.Validate())
+                if (this.transition.startConditions.Validate(this.transition))
                 {
-                    this.transition.startConditions.Invalidate();
+                    this.transition.startConditions.Invalidate(this.transition);
                     this.transition.MachineI.StartTransition(this.transition, this.transition.signal);
                     this.transition.status = this.transition.finishingStatus;
                 }
@@ -259,9 +259,9 @@ namespace QuaStateMachine
 
             public override void Tick()
             {
-                if (this.transition.finishConditions.Validate())
+                if (this.transition.finishConditions.Validate(this.transition))
                 {
-                    this.transition.finishConditions.Invalidate();
+                    this.transition.finishConditions.Invalidate(this.transition);
                     this.transition.MachineI.FinishTransition(this.transition);
                 }
 

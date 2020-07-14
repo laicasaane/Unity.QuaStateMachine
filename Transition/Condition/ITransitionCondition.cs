@@ -2,8 +2,8 @@
 {
     public interface ITransitionCondition
     {
-        bool Validate();
+        bool Validate(ITransition transition);
 
-        void Invalidate();
+        void Invalidate(ITransition transition);
     }
 }

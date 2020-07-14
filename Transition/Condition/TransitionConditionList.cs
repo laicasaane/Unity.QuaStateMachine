@@ -10,23 +10,23 @@ namespace QuaStateMachine
 
         internal TransitionConditionList(IEnumerable<ITransitionCondition> collection) : base(collection) { }
 
-        internal bool Validate()
+        internal bool Validate(ITransition transition)
         {
             var result = true;
 
             for (var i = 0; i < this.Count; i++)
             {
-                result &= this[i].Validate();
+                result &= this[i].Validate(transition);
             }
 
             return result;
         }
 
-        internal void Invalidate()
+        internal void Invalidate(ITransition transition)
         {
             for (var i = 0; i < this.Count; i++)
             {
-                this[i].Invalidate();
+                this[i].Invalidate(transition);
             }
         }
     }

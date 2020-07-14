@@ -23,6 +23,27 @@ namespace QuaStateMachine
             return this;
         }
 
+        public Signal<TState, TTransition, TSignal> EmitWhen(
+            ISignalCondition condition)
+        {
+            this.Machine.CreateEmitCondition(this, condition);
+            return this;
+        }
+
+        public Signal<TState, TTransition, TSignal> EmitWhen<T>()
+            where T : ISignalCondition, new()
+        {
+            this.Machine.CreateEmitCondition(this, new T());
+            return this;
+        }
+
+        public Signal<TState, TTransition, TSignal> EmitWhen(
+            Func<bool> condition)
+        {
+            this.Machine.CreateEmitCondition(this, new SignalCondition(condition));
+            return this;
+        }
+
         public Signal<TState, TTransition, TSignal> TransitionWhen(
             TTransition transitionName, params TState[] conditionalStateNames)
         {
@@ -48,6 +69,62 @@ namespace QuaStateMachine
             Transition<TState, TTransition, TSignal> transition, params State<TState, TTransition, TSignal>[] conditionalStates)
         {
             this.Machine.CreateTransitionCondition(this, transition, conditionalStates);
+            return this;
+        }
+
+        public Signal<TState, TTransition, TSignal> TransitionWhen(
+            TTransition transitionName, ISignalCondition condition)
+        {
+            this.Machine.CreateTransitionCondition(this, transitionName, condition);
+            return this;
+        }
+
+        public Signal<TState, TTransition, TSignal> TransitionWhen(
+            Transition<TState, TTransition, TSignal> transition, ISignalCondition condition)
+        {
+            this.Machine.CreateTransitionCondition(this, transition, condition);
+            return this;
+        }
+
+        public Signal<TState, TTransition, TSignal> TransitionWhen<T>(
+            TTransition transitionName) where T : ISignalCondition, new()
+        {
+            this.Machine.CreateTransitionCondition(this, transitionName, new T());
+            return this;
+        }
+
+        public Signal<TState, TTransition, TSignal> TransitionWhen<T>(
+            Transition<TState, TTransition, TSignal> transition) where T : ISignalCondition, new()
+        {
+            this.Machine.CreateTransitionCondition(this, transition, new T());
+            return this;
+        }
+
+        public Signal<TState, TTransition, TSignal> TransitionWhen(
+            TTransition transitionName, Func<bool> condition)
+        {
+            this.Machine.CreateTransitionCondition(this, transitionName, new SignalCondition(condition));
+            return this;
+        }
+
+        public Signal<TState, TTransition, TSignal> TransitionWhen(
+            Transition<TState, TTransition, TSignal> transition, Func<bool> condition)
+        {
+            this.Machine.CreateTransitionCondition(this, transition, new SignalCondition(condition));
+            return this;
+        }
+
+        public Signal<TState, TTransition, TSignal> TransitionWhen(
+            TTransition transitionName, Predicate<ISignal> condition)
+        {
+            this.Machine.CreateTransitionCondition(this, transitionName, new ParamSignalCondition(condition));
+            return this;
+        }
+
+        public Signal<TState, TTransition, TSignal> TransitionWhen(
+            Transition<TState, TTransition, TSignal> transition, Predicate<ISignal> condition)
+        {
+            this.Machine.CreateTransitionCondition(this, transition, new ParamSignalCondition(condition));
             return this;
         }
 

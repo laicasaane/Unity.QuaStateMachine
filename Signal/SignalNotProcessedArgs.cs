@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace QuaStateMachine
 {
@@ -7,9 +6,9 @@ namespace QuaStateMachine
     {
         public SignalFailure FailureCause { get; }
 
-        public IReadOnlyList<ISignalCondition> FailedConditions { get; }
+        public ISignalCondition[] FailedConditions { get; }
 
-        internal SignalNotProcessedArgs(SignalFailure failureCause, List<ISignalCondition> failedConditions = null)
+        internal SignalNotProcessedArgs(SignalFailure failureCause, ISignalCondition[] failedConditions = null)
         {
             this.FailureCause = failureCause;
             this.FailedConditions = failedConditions;
