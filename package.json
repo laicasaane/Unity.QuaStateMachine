@@ -5,6 +5,6 @@
   "description": "A Unity package for QuaStateMachine which also contains many improvements.",
   "license": "MIT",
   "category": "library",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "unity": "2019.1"
 }
