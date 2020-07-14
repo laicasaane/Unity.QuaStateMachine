@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     public partial class StateMachine<TState, TTransition, TSignal>
         : IStateMachine<TState, TTransition, TSignal>

@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using FluentQuaStateMachine;
 
-namespace Examples
+namespace QuaStateMachine.Examples
 {
     public class Example : MonoBehaviour
     {

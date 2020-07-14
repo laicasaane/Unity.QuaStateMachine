@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     public readonly partial struct OrthogonalSignal<TState, TTransition, TSignal>
     {

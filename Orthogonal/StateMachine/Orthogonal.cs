@@ -1,4 +1,4 @@
-﻿namespace FluentQuaStateMachine
+﻿namespace QuaStateMachine
 {
     public sealed partial class Orthogonal<TState, TTransition, TSignal>
         : IOrthogonal<TState, TTransition, TSignal>

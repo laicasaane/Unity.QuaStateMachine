@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     internal class InvalidTransitionException<TState, TTransition> : Exception
     {

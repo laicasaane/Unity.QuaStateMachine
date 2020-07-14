@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     public sealed partial class Orthogonal<TState, TTransition, TSignal>
     {

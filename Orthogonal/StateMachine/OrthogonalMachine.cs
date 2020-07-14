@@ -1,4 +1,4 @@
-﻿namespace FluentQuaStateMachine
+﻿namespace QuaStateMachine
 {
     public readonly partial struct OrthogonalMachine<TState, TTransition, TSignal>
     {

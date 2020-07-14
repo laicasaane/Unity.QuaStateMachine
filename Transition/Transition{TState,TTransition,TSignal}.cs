@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     public sealed partial class Transition<TState, TTransition, TSignal>
         : Transition<TTransition>, ITransition<TState, TTransition, TSignal>

@@ -1,4 +1,4 @@
-﻿namespace FluentQuaStateMachine
+﻿namespace QuaStateMachine
 {
     public abstract class SignalActionBase<T> : SignalActionBase, ISignalAction<T>
     {

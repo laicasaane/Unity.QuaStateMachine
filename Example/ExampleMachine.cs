@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using FluentQuaStateMachine;
 
-namespace Examples
+namespace QuaStateMachine.Examples
 {
     using State = State<string, StateDirection<string>, string>;
     using Transition = Transition<string, StateDirection<string>, string>;
@@ -201,7 +200,7 @@ namespace Examples
                 .End()
                 .Begin(MainStates.B)
                     .On(new BranchedStateAction((KeyCode.C, MainSignals.B_C),
-                                                    (KeyCode.D, MainSignals.B_D)))
+                                                (KeyCode.D, MainSignals.B_D)))
                     .OnEnterComplete(example.UpdateStateName)
                     .OnTick(example.UpdateStateTime)
                 .End()

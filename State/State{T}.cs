@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     public abstract class State<T> : IState<T>, IEquatable<State<T>>, IEquatable<T>
     {

@@ -1,4 +1,4 @@
-﻿namespace FluentQuaStateMachine
+﻿namespace QuaStateMachine
 {
     public abstract class TransitionActionBase<TState, TTransition, TSignal> : TransitionActionBase<TTransition>, ITransitionAction<TState, TTransition, TSignal>
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     public readonly struct StateDirection<T> : IEquatable<StateDirection<T>>
     {

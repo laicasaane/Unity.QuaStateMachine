@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     internal sealed class TransitionConditionList : List<ITransitionCondition>
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     public sealed class SignalCondition<TState, TTransition, TSignal> : ISignalCondition<TState, TTransition, TSignal>
     {

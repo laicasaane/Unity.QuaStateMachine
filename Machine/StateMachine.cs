@@ -1,4 +1,4 @@
-﻿namespace FluentQuaStateMachine
+﻿namespace QuaStateMachine
 {
     using Transition = Transition<string, StateDirection<string>, string>;
     using Signal = Signal<string, StateDirection<string>, string>;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     public partial class StateMachine<TState, TTransition, TSignal>
     {

@@ -1,4 +1,4 @@
-﻿namespace FluentQuaStateMachine
+﻿namespace QuaStateMachine
 {
     public abstract class StateMachineActionBase<T> : StateMachineActionBase, IStateMachineAction<T>
     {

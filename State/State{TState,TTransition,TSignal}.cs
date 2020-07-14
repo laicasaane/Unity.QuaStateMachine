@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     public sealed partial class State<TState, TTransition, TSignal>
         : State<TState>, IState<TState, TTransition, TSignal>

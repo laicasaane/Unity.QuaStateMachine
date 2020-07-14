@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FluentQuaStateMachine
+namespace QuaStateMachine
 {
     public readonly struct TransitionCondition : ITransitionCondition, IEquatable<TransitionCondition>, IEqualityComparer<TransitionCondition>
     {
