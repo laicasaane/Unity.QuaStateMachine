@@ -2,7 +2,7 @@
 
 namespace QuaStateMachine
 {
-    internal sealed class SignalActionEmit : SignalActionBase
+    internal sealed class SignalActionEmit : DefaultSignalAction
     {
         private readonly Action<ISignalAction> action;
 

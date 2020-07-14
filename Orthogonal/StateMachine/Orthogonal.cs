@@ -35,7 +35,7 @@
         public static explicit operator Orthogonal<TState, TTransition, TSignal>(StateMachine<TState, TTransition, TSignal> machine)
             => new Orthogonal<TState, TTransition, TSignal>(machine);
 
-        private sealed class FireOnStateChangedAction : StateMachineActionBase
+        private sealed class FireOnStateChangedAction : DefaultStateMachineAction
         {
             private readonly StateMachine<TState, TTransition, TSignal> machine;
 

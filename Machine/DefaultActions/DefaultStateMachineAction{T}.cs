@@ -1,6 +1,6 @@
 ﻿namespace QuaStateMachine
 {
-    public abstract class StateMachineActionBase<T> : StateMachineActionBase, IStateMachineAction<T>
+    internal abstract class DefaultStateMachineAction<T> : DefaultStateMachineAction, IStateMachineAction<T>
     {
         public virtual void StateChange(IState<T> former, IState<T> current) { }
 

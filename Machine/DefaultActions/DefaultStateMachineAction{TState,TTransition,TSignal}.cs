@@ -1,7 +1,7 @@
 ﻿namespace QuaStateMachine
 {
-    public abstract class StateMachineActionBase<TState, TTransition, TSignal>
-        : StateMachineActionBase<TState>, IStateMachineAction<TState, TTransition, TSignal>
+    internal abstract class DefaultStateMachineAction<TState, TTransition, TSignal>
+        : DefaultStateMachineAction<TState>, IStateMachineAction<TState, TTransition, TSignal>
     {
         public new StateMachine<TState, TTransition, TSignal> Machine
         {

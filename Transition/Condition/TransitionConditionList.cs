@@ -21,5 +21,13 @@ namespace QuaStateMachine
 
             return result;
         }
+
+        internal void Invalidate()
+        {
+            for (var i = 0; i < this.Count; i++)
+            {
+                this[i].Invalidate();
+            }
+        }
     }
 }

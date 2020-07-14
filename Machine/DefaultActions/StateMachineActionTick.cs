@@ -2,7 +2,7 @@
 
 namespace QuaStateMachine
 {
-    internal sealed class StateMachineActionTick : StateMachineActionBase
+    internal sealed class StateMachineActionTick : DefaultStateMachineAction
     {
         private readonly Action<IStateMachineAction> action;
 

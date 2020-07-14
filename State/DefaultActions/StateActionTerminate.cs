@@ -2,7 +2,7 @@
 
 namespace QuaStateMachine
 {
-    internal sealed class StateActionTerminate : StateActionBase
+    internal sealed class StateActionTerminate : DefaultStateAction
     {
         private readonly Action<IStateAction> action;
 

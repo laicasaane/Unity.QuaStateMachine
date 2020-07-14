@@ -244,6 +244,7 @@ namespace QuaStateMachine
             {
                 if (this.transition.startConditions.Validate())
                 {
+                    this.transition.startConditions.Invalidate();
                     this.transition.MachineI.StartTransition(this.transition, this.transition.signal);
                     this.transition.status = this.transition.finishingStatus;
                 }
@@ -260,6 +261,7 @@ namespace QuaStateMachine
             {
                 if (this.transition.finishConditions.Validate())
                 {
+                    this.transition.finishConditions.Invalidate();
                     this.transition.MachineI.FinishTransition(this.transition);
                 }
 

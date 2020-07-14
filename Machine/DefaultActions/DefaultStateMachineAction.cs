@@ -1,6 +1,6 @@
 ﻿namespace QuaStateMachine
 {
-    public abstract class StateMachineActionBase : IStateMachineAction
+    internal abstract class DefaultStateMachineAction : IStateMachineAction
     {
         public IStateMachine Machine
         {

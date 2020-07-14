@@ -3,7 +3,7 @@
 namespace QuaStateMachine
 {
     internal sealed class StateMachineActionStateChange<TState, TTransition, TSignal>
-        : StateMachineActionBase<TState, TTransition, TSignal>
+        : DefaultStateMachineAction<TState, TTransition, TSignal>
     {
         private readonly Action<IStateMachineAction, State<TState, TTransition, TSignal>, State<TState, TTransition, TSignal>> action;
 

@@ -2,7 +2,7 @@
 
 namespace QuaStateMachine
 {
-    internal sealed class TransitionActionTick : TransitionActionBase
+    internal sealed class TransitionActionTick : DefaultTransitionAction
     {
         private readonly Action<ITransitionAction> action;
 

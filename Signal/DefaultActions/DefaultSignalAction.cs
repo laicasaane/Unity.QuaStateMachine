@@ -1,6 +1,6 @@
 ﻿namespace QuaStateMachine
 {
-    public abstract class SignalActionBase : ISignalAction
+    internal abstract class DefaultSignalAction : ISignalAction
     {
         public ISignal Signal
         {

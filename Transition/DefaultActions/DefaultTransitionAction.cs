@@ -1,6 +1,6 @@
 ﻿namespace QuaStateMachine
 {
-    public abstract class TransitionActionBase : ITransitionAction
+    internal abstract class DefaultTransitionAction : ITransitionAction
     {
         public ITransition Transition
         {
