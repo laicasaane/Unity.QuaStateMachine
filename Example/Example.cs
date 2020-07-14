@@ -8,6 +8,10 @@ namespace QuaStateMachine.Examples
     public class Example : MonoBehaviour
     {
         [SerializeField]
+        private float totalTransitionTime = 1f;
+
+        [Space]
+        [SerializeField]
         private Text stateNameText = null;
 
         [SerializeField]
@@ -24,21 +28,32 @@ namespace QuaStateMachine.Examples
 
         [Space]
         [SerializeField]
-        private List<KeyValue> mainStates = null;
+        private List<KeyedGameObject> mainStates = null;
 
         [SerializeField]
-        private List<KeyValue> bSubStates = null;
+        private List<KeyedGameObject> bSubStates = null;
 
         [SerializeField]
-        private List<KeyValue> b2SubStates = null;
+        private List<KeyedGameObject> b2SubStates = null;
+
+        [Space]
+        [SerializeField]
+        private List<KeyedSlider> mainTransitions = null;
+
+        public float TotalTransitionTime
+            => this.totalTransitionTime;
 
         private readonly Dictionary<string, GameObject> mainStateMap = new Dictionary<string, GameObject>();
         private readonly Dictionary<string, GameObject> bSubStateMap = new Dictionary<string, GameObject>();
         private readonly Dictionary<string, GameObject> b2SubStateMap = new Dictionary<string, GameObject>();
 
+        private readonly Dictionary<string, Slider> mainTransitionMap = new Dictionary<string, Slider>();
+
         private StateMachine machine;
         private float stateEnterTime;
         private float transitionTime;
+
+        private Slider mainSlider;
 
         private void Awake()
         {
@@ -46,9 +61,13 @@ namespace QuaStateMachine.Examples
             PrepareMap(this.bSubStates, this.bSubStateMap);
             PrepareMap(this.b2SubStates, this.b2SubStateMap);
 
+            PrepareMap(this.mainTransitions, this.mainTransitionMap);
+
             HideAll(this.mainStates);
             HideAll(this.bSubStates);
             HideAll(this.b2SubStates);
+
+            ResetAll(this.mainTransitions);
         }
 
         private void Start()
@@ -95,7 +114,7 @@ namespace QuaStateMachine.Examples
             this.stateNameText.text = stateName;
             this.stateEnterTime = Time.time;
 
-            HideAll(this.mainStates);
+            HideAll(this.mainStates, stateName);
 
             if (this.mainStateMap.TryGetValue(stateName, out var go))
                 go.SetActive(true);
@@ -108,8 +127,15 @@ namespace QuaStateMachine.Examples
 
         public void UpdateMainTransitionName(ITransitionAction action, TransitionArgs _)
         {
-            this.transitionNameText.text = $"{action.Transition.Name}";
+            var transitionName = $"{action.Transition.Name}";
+            this.transitionNameText.text = transitionName;
             this.transitionTime = Time.time;
+            this.mainSlider = null;
+
+            ResetAll(this.mainTransitions, transitionName);
+
+            if (this.mainTransitionMap.TryGetValue(transitionName, out var slider))
+                this.mainSlider = slider;
         }
 
         public void RemoveMainTransitionName(ITransitionAction _)
@@ -119,22 +145,34 @@ namespace QuaStateMachine.Examples
 
         public void UpdateMainTransitionTime(ITransitionAction _)
         {
-            this.transitionTimeText.text = $"{Time.time - this.transitionTime}";
+            var elapsed = Time.time - this.transitionTime;
+            this.transitionTimeText.text = $"{elapsed}";
+
+            if (this.mainSlider)
+            {
+                this.mainSlider.value = elapsed / this.totalTransitionTime;
+            }
         }
 
-        public void OnInvalidateTransition(ITransition transition)
+        public void OnInvalidateTransition(ITransition _)
         {
-
         }
 
         [Serializable]
-        private sealed class KeyValue
+        private sealed class KeyedGameObject
         {
-            public string Key;
-            public GameObject Value;
+            public string Key = string.Empty;
+            public GameObject Value = null;
         }
 
-        private void PrepareMap(List<KeyValue> list, Dictionary<string, GameObject> map)
+        [Serializable]
+        private sealed class KeyedSlider
+        {
+            public string Key = string.Empty;
+            public Slider Value = null;
+        }
+
+        private void PrepareMap(List<KeyedGameObject> list, Dictionary<string, GameObject> map)
         {
             foreach (var kv in list)
             {
@@ -142,11 +180,33 @@ namespace QuaStateMachine.Examples
             }
         }
 
-        private void HideAll(List<KeyValue> list)
+        private void HideAll(List<KeyedGameObject> list, string except = null)
         {
             foreach (var kv in list)
             {
+                if (!string.IsNullOrEmpty(except) && string.Equals(kv.Key, except))
+                    continue;
+
                 kv.Value.SetActive(false);
+            }
+        }
+
+        private void PrepareMap(List<KeyedSlider> list, Dictionary<string, Slider> map)
+        {
+            foreach (var kv in list)
+            {
+                map[kv.Key] = kv.Value;
+            }
+        }
+
+        private void ResetAll(List<KeyedSlider> list, string except = null)
+        {
+            foreach (var kv in list)
+            {
+                if (!string.IsNullOrEmpty(except) && string.Equals(kv.Key, except))
+                    continue;
+
+                kv.Value.value = 0f;
             }
         }
     }

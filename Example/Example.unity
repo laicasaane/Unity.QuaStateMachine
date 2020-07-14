@@ -2403,6 +2403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d949ee71f2c7f843bc5f20a6cd903df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  totalTransitionTime: 1
   stateNameText: {fileID: 889871334}
   stateTimeText: {fileID: 1527625130}
   transitionNameText: {fileID: 710922345}
@@ -2429,6 +2430,19 @@ MonoBehaviour:
     Value: {fileID: 1252995149}
   - Key: B22
     Value: {fileID: 98894342}
+  mainTransitions:
+  - Key: (A --> B)
+    Value: {fileID: 896918630}
+  - Key: (B --> C)
+    Value: {fileID: 1237133721}
+  - Key: (B --> D)
+    Value: {fileID: 1884222087}
+  - Key: (C --> E)
+    Value: {fileID: 1087891088}
+  - Key: (D --> E)
+    Value: {fileID: 1685431233}
+  - Key: (E --> A)
+    Value: {fileID: 2092401325}
 --- !u!1 &1087891086
 GameObject:
   m_ObjectHideFlags: 0
