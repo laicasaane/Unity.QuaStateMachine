@@ -1,4 +1,4 @@
-﻿# Unity.QuaStateMachine
+# Unity.QuaStateMachine
 
 A Unity package for [QuaStateMachine](https://github.com/qua11q7/QuaStateMachine) which also contains many improvements.
 
@@ -39,5 +39,3 @@ Signals
 - D_E
 - B1_B2
 - B21_B22
-
-All of the states are connected to each other with *Transitions*. Transitions can be triggered via emitting the corresponding *Signal*. In the diagram above, 10 transitions can be seen. Two of the transitions indicate that **Active** and **Stopped** states should be the initial state of their corresponding level. There are two transitions between **Stopped** and **Running** states, one leading from **Stopped** to **Running** and the other leading from **Running** to **Stopped**. These two different transitions are connected to the same signal, **StartStop**. If the current state is **Stopped** and the **StartStop** signal is emitted, state machine will change its state to **Running** state. If the current state is **Started** and the **StartStop** signal is emitted, state machine then will change its state to **Stopped** state.  There cannot be a transition without a connected signal.
