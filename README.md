@@ -74,7 +74,7 @@ public static void CreateTransitions(StateMachine machine)
 }
 ```
 
-To start a transition, their must be at least one *Signal* connected to it.
+To start a transition, there must be at least one *Signal* connected to it.
 
 ```csharp
 public static void CreateSignals(StateMachine machine)
@@ -92,7 +92,7 @@ public static void CreateSignals(StateMachine machine)
 
 The same for the sub states.
 
-**Note:** One signal can be used for many transitions. So instead of creating new signal, we can connect an existing signal to the transitions.
+**Note:** One signal can be used for many transitions. So instead of creating new signal, we can connect an existing one to the transitions.
 
 ```csharp
 public static class BSubSignal
