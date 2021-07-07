@@ -3,13 +3,15 @@
     "references": [
         "Unity.QuaStateMachine"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": []
+    "defineConstraints": [
+        "UNITY_EDITOR || ENABLE_QUASTATEMACHINE_EXAMPLE"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
