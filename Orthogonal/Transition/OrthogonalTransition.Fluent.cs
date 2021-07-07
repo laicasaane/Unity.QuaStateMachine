@@ -108,5 +108,47 @@ namespace QuaStateMachine
             this.Transition.OnFinish(action);
             return this;
         }
+
+        public OrthogonalTransition<TState, TTransition, TSignal> OnFixedTick(
+            Action<ITransitionAction> action)
+        {
+            this.Transition.OnFixedTick(action);
+            return this;
+        }
+
+        public OrthogonalTransition<TState, TTransition, TSignal> OnPostFixedTick(
+            Action<ITransitionAction> action)
+        {
+            this.Transition.OnPostFixedTick(action);
+            return this;
+        }
+
+        public OrthogonalTransition<TState, TTransition, TSignal> OnTick(
+            Action<ITransitionAction> action)
+        {
+            this.Transition.OnTick(action);
+            return this;
+        }
+
+        public OrthogonalTransition<TState, TTransition, TSignal> OnPostTick(
+            Action<ITransitionAction> action)
+        {
+            this.Transition.OnPostTick(action);
+            return this;
+        }
+
+        public OrthogonalTransition<TState, TTransition, TSignal> OnLateTick(
+            Action<ITransitionAction> action)
+        {
+            this.Transition.OnLateTick(action);
+            return this;
+        }
+
+        public OrthogonalTransition<TState, TTransition, TSignal> OnPostLateTick(
+            Action<ITransitionAction> action)
+        {
+            this.Transition.OnPostLateTick(action);
+            return this;
+        }
     }
 }

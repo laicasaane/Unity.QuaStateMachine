@@ -359,11 +359,9 @@ namespace QuaStateMachine.Examples
         {
             Debug.Log($"Terminate State [{this.State.Name}]");
         }
-
-        public virtual void Tick() { }
     }
 
-    public class NextStateAction : DefaultStateAction
+    public class NextStateAction : DefaultStateAction, ITickable
     {
         private readonly Signal nextStateSignal;
         private readonly KeyCode nextStateKey;
@@ -374,14 +372,14 @@ namespace QuaStateMachine.Examples
             this.nextStateKey = nextStateKey ?? KeyCode.Space;
         }
 
-        public override void Tick()
+        public void Tick()
         {
             if (Input.GetKeyUp(this.nextStateKey))
                 this.nextStateSignal?.Emit();
         }
     }
 
-    public class BranchedStateAction : DefaultStateAction
+    public class BranchedStateAction : DefaultStateAction, ITickable
     {
         private readonly Dictionary<KeyCode, Signal> signalMap = new Dictionary<KeyCode, Signal>();
 
@@ -393,7 +391,7 @@ namespace QuaStateMachine.Examples
             }
         }
 
-        public override void Tick()
+        public void Tick()
         {
             foreach (var kv in this.signalMap)
             {

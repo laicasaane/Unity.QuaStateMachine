@@ -126,6 +126,36 @@ namespace QuaStateMachine
             return this;
         }
 
+        public Transition<TState, TTransition, TSignal> OnFinish(
+            Action<ITransitionAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new TransitionActionFinish(action));
+            return this;
+        }
+
+        public Transition<TState, TTransition, TSignal> OnFixedTick(
+            Action<ITransitionAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new TransitionActionTickFixed(action));
+            return this;
+        }
+
+        public Transition<TState, TTransition, TSignal> OnPostFixedTick(
+            Action<ITransitionAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new TransitionActionTickFixedPost(action));
+            return this;
+        }
+
         public Transition<TState, TTransition, TSignal> OnTick(
             Action<ITransitionAction> action)
         {
@@ -136,13 +166,33 @@ namespace QuaStateMachine
             return this;
         }
 
-        public Transition<TState, TTransition, TSignal> OnFinish(
+        public Transition<TState, TTransition, TSignal> OnPostTick(
             Action<ITransitionAction> action)
         {
             if (action == null)
                 return this;
 
-            AddAction(new TransitionActionFinish(action));
+            AddAction(new TransitionActionTickPost(action));
+            return this;
+        }
+
+        public Transition<TState, TTransition, TSignal> OnLateTick(
+            Action<ITransitionAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new TransitionActionTickLate(action));
+            return this;
+        }
+
+        public Transition<TState, TTransition, TSignal> OnPostLateTick(
+            Action<ITransitionAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new TransitionActionTickLatePost(action));
             return this;
         }
     }

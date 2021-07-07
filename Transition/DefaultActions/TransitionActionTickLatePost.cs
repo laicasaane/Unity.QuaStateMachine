@@ -2,16 +2,16 @@
 
 namespace QuaStateMachine
 {
-    internal sealed class TransitionActionTick : DefaultTransitionAction, ITickable
+    internal sealed class TransitionActionTickLatePost : DefaultTransitionAction, IPostLateTickable
     {
         private readonly Action<ITransitionAction> action;
 
-        internal TransitionActionTick(Action<ITransitionAction> action)
+        internal TransitionActionTickLatePost(Action<ITransitionAction> action)
         {
             this.action = action ?? throw new ArgumentNullException(nameof(action));
         }
 
-        public void Tick()
+        public void PostLateTick()
         {
             this.action(this);
         }

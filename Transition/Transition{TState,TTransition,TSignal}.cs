@@ -4,7 +4,10 @@ using System.Runtime.CompilerServices;
 namespace QuaStateMachine
 {
     public sealed partial class Transition<TState, TTransition, TSignal>
-        : Transition<TTransition>, ITransition<TState, TTransition, TSignal>
+        : Transition<TTransition>, ITransition<TState, TTransition, TSignal>,
+          IFixedTickable, IPostFixedTickable,
+          ITickable, IPostTickable,
+          ILateTickable, IPostLateTickable
     {
         public override bool CanTransition
             => this.CanTransitionI;
@@ -56,6 +59,8 @@ namespace QuaStateMachine
         internal bool CanTransitionI { get; set; }
 
         private readonly TransitionActionList actions;
+        private readonly TickableList tickableActions;
+
         private readonly TransitionConditionList startConditions;
         private readonly TransitionConditionList finishConditions;
 
@@ -66,25 +71,30 @@ namespace QuaStateMachine
         private Status status;
         private Signal<TState, TTransition, TSignal> signal;
 
-        internal Transition(StateMachine<TState, TTransition, TSignal> machine, TTransition name) : base(name)
+        internal Transition(StateMachine<TState, TTransition, TSignal> machine, TTransition name, TickType tickType) : base(name)
         {
             this.MachineI = machine;
             this.CanTransitionI = true;
             this.SignalsI = new List<Signal<TState, TTransition, TSignal>>();
 
             this.actions = new TransitionActionList();
+            this.tickableActions = new TickableList();
+
             this.startConditions = new TransitionConditionList();
             this.finishConditions = new TransitionConditionList();
 
-            this.idleStatus = new IdleStatus(this);
-            this.startingStatus = new StartingStatus(this);
-            this.finishingStatus = new FinishingStatus(this);
+            this.idleStatus = new IdleStatus(this, tickType);
+            this.startingStatus = new StartingStatus(this, tickType);
+            this.finishingStatus = new FinishingStatus(this, tickType);
 
             this.status = this.idleStatus;
             this.signal = null;
         }
 
-        internal Transition(StateMachine<TState, TTransition, TSignal> machine, TTransition name, State<TState, TTransition, TSignal> startState, State<TState, TTransition, TSignal> endState) : this(machine, name)
+        internal Transition(StateMachine<TState, TTransition, TSignal> machine, TTransition name,
+                            State<TState, TTransition, TSignal> startState, State<TState, TTransition, TSignal> endState,
+                            TickType tickType)
+            : this(machine, name, tickType)
         {
             SetTransition(startState, endState);
         }
@@ -110,6 +120,7 @@ namespace QuaStateMachine
             }
 
             this.actions.Add(action);
+            this.tickableActions.Add(action);
             return true;
         }
 
@@ -173,9 +184,34 @@ namespace QuaStateMachine
             return true;
         }
 
-        internal void Tick()
+        public void FixedTick()
+        {
+            this.status.FixedTick();
+        }
+
+        public void PostFixedTick()
+        {
+            this.status.PostFixedTick();
+        }
+
+        public void Tick()
         {
             this.status.Tick();
+        }
+
+        public void PostTick()
+        {
+            this.status.PostTick();
+        }
+
+        public void LateTick()
+        {
+            this.status.LateTick();
+        }
+
+        public void PostLateTick()
+        {
+            this.status.PostLateTick();
         }
 
         internal bool Start()
@@ -217,55 +253,153 @@ namespace QuaStateMachine
         protected override IState GetEndState()
             => this.EndStateI;
 
-        private abstract class Status
+        private abstract class Status :
+            IFixedTickable, IPostFixedTickable,
+            ITickable, IPostTickable,
+            ILateTickable, IPostLateTickable
         {
             protected readonly Transition<TState, TTransition, TSignal> transition;
+            protected readonly TickType tickType;
 
-            public Status(Transition<TState, TTransition, TSignal> transition)
+            public Status(Transition<TState, TTransition, TSignal> transition, TickType tickType)
             {
                 this.transition = transition;
+                this.tickType = tickType;
             }
 
+            public abstract void FixedTick();
+
+            public abstract void PostFixedTick();
+
             public abstract void Tick();
+
+            public abstract void PostTick();
+
+            public abstract void LateTick();
+
+            public abstract void PostLateTick();
         }
 
         private sealed class IdleStatus : Status
         {
-            public IdleStatus(Transition<TState, TTransition, TSignal> transition) : base(transition) { }
+            public IdleStatus(Transition<TState, TTransition, TSignal> transition, TickType tickType)
+                : base(transition, tickType) { }
+
+            public override void FixedTick() { }
+
+            public override void PostFixedTick() { }
 
             public override void Tick() { }
+
+            public override void PostTick() { }
+
+            public override void LateTick() { }
+
+            public override void PostLateTick() { }
         }
 
         private sealed class StartingStatus : Status
         {
-            public StartingStatus(Transition<TState, TTransition, TSignal> transition) : base(transition) { }
+            public StartingStatus(Transition<TState, TTransition, TSignal> transition, TickType tickType)
+                : base(transition, tickType) { }
+
+            private void StartTransition(TickType tickType)
+            {
+                if (this.tickType != tickType ||
+                    !this.transition.startConditions.Validate(this.transition))
+                    return;
+
+                this.transition.startConditions.Invalidate(this.transition);
+                this.transition.MachineI.StartTransition(this.transition, this.transition.signal);
+                this.transition.status = this.transition.finishingStatus;
+            }
+
+            public override void FixedTick()
+            {
+                StartTransition(TickType.FixedTick);
+                this.transition.tickableActions.FixedTickables.FixedTick();
+            }
+
+            public override void PostFixedTick()
+            {
+                StartTransition(TickType.PostFixedTick);
+                this.transition.tickableActions.PostFixedTickables.PostFixedTick();
+            }
 
             public override void Tick()
             {
-                if (this.transition.startConditions.Validate(this.transition))
-                {
-                    this.transition.startConditions.Invalidate(this.transition);
-                    this.transition.MachineI.StartTransition(this.transition, this.transition.signal);
-                    this.transition.status = this.transition.finishingStatus;
-                }
+                StartTransition(TickType.Tick);
+                this.transition.tickableActions.Tickables.Tick();
+            }
 
-                this.transition.actions.Tick();
+            public override void PostTick()
+            {
+                StartTransition(TickType.PostTick);
+                this.transition.tickableActions.PostTickables.PostTick();
+            }
+
+            public override void LateTick()
+            {
+                StartTransition(TickType.LateTick);
+                this.transition.tickableActions.LateTickables.LateTick();
+            }
+
+            public override void PostLateTick()
+            {
+                StartTransition(TickType.PostLateTick);
+                this.transition.tickableActions.PostLateTickables.PostLateTick();
             }
         }
 
         private sealed class FinishingStatus : Status
         {
-            public FinishingStatus(Transition<TState, TTransition, TSignal> transition) : base(transition) { }
+            public FinishingStatus(Transition<TState, TTransition, TSignal> transition, TickType tickType)
+                : base(transition, tickType) { }
+
+            private void FinishTransition(TickType tickType)
+            {
+                if (this.tickType != tickType ||
+                    !this.transition.finishConditions.Validate(this.transition))
+                    return;
+
+                this.transition.finishConditions.Invalidate(this.transition);
+                this.transition.MachineI.FinishTransition(this.transition);
+            }
+
+            public override void FixedTick()
+            {
+                FinishTransition(TickType.FixedTick);
+                this.transition.tickableActions.FixedTickables.FixedTick();
+            }
+
+            public override void PostFixedTick()
+            {
+                FinishTransition(TickType.PostFixedTick);
+                this.transition.tickableActions.PostFixedTickables.PostFixedTick();
+            }
 
             public override void Tick()
             {
-                if (this.transition.finishConditions.Validate(this.transition))
-                {
-                    this.transition.finishConditions.Invalidate(this.transition);
-                    this.transition.MachineI.FinishTransition(this.transition);
-                }
+                FinishTransition(TickType.Tick);
+                this.transition.tickableActions.Tickables.Tick();
+            }
 
-                this.transition.actions.Tick();
+            public override void PostTick()
+            {
+                FinishTransition(TickType.PostTick);
+                this.transition.tickableActions.PostTickables.PostTick();
+            }
+
+            public override void LateTick()
+            {
+                FinishTransition(TickType.LateTick);
+                this.transition.tickableActions.LateTickables.LateTick();
+            }
+
+            public override void PostLateTick()
+            {
+                FinishTransition(TickType.PostLateTick);
+                this.transition.tickableActions.PostLateTickables.PostLateTick();
             }
         }
     }

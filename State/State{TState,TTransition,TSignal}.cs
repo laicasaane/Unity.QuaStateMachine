@@ -5,7 +5,10 @@ using System.Runtime.CompilerServices;
 namespace QuaStateMachine
 {
     public sealed partial class State<TState, TTransition, TSignal>
-        : State<TState>, IState<TState, TTransition, TSignal>
+        : State<TState>, IState<TState, TTransition, TSignal>,
+          IFixedTickable, IPostFixedTickable,
+          ITickable, IPostTickable,
+          ILateTickable, IPostLateTickable
     {
         public State<TState, TTransition, TSignal> OuterState { get; internal set; }
 
@@ -37,6 +40,7 @@ namespace QuaStateMachine
         internal Dictionary<int, Orthogonal<TState, TTransition, TSignal>> OrthogonalsI { get; }
 
         private readonly StateActionList actions;
+        private readonly TickableList tickableActions;
 
         private readonly IdleStateStatus idleStateStatus;
         private readonly CurrentStateStatus currentStateStatus;
@@ -52,6 +56,7 @@ namespace QuaStateMachine
             };
 
             this.actions = new StateActionList();
+            this.tickableActions = new TickableList();
 
             this.idleStateStatus = new IdleStateStatus(this);
             this.currentStateStatus = new CurrentStateStatus(this);
@@ -80,6 +85,7 @@ namespace QuaStateMachine
             }
 
             this.actions.Add(action);
+            this.tickableActions.Add(action);
             return true;
         }
 
@@ -204,9 +210,34 @@ namespace QuaStateMachine
             this.status = this.idleStateStatus;
         }
 
-        internal void Tick()
+        public void FixedTick()
+        {
+            this.status.FixedTick();
+        }
+
+        public void PostFixedTick()
+        {
+            this.status.PostFixedTick();
+        }
+
+        public void Tick()
         {
             this.status.Tick();
+        }
+
+        public void PostTick()
+        {
+            this.status.PostTick();
+        }
+
+        public void LateTick()
+        {
+            this.status.LateTick();
+        }
+
+        public void PostLateTick()
+        {
+            this.status.PostLateTick();
         }
 
         internal void PassSignal(Signal<TState, TTransition, TSignal> signal)
@@ -234,7 +265,10 @@ namespace QuaStateMachine
         protected override IReadOnlyDictionary<int, IOrthogonal> GetOrthogonalMachines()
             => this.OrthogonalsI.ToDictionary(x => x.Key, x => x.Value as IOrthogonal);
 
-        private abstract class Status
+        private abstract class Status :
+            IFixedTickable, IPostFixedTickable,
+            ITickable, IPostTickable,
+            ILateTickable, IPostLateTickable
         {
             protected readonly State<TState, TTransition, TSignal> state;
 
@@ -243,27 +277,97 @@ namespace QuaStateMachine
                 this.state = state;
             }
 
+            public abstract void FixedTick();
+
+            public abstract void PostFixedTick();
+
             public abstract void Tick();
+
+            public abstract void PostTick();
+
+            public abstract void LateTick();
+
+            public abstract void PostLateTick();
         }
 
         private sealed class IdleStateStatus : Status
         {
             public IdleStateStatus(State<TState, TTransition, TSignal> state) : base(state) { }
 
+            public override void FixedTick() { }
+
+            public override void PostFixedTick() { }
+
             public override void Tick() { }
+
+            public override void PostTick() { }
+
+            public override void LateTick() { }
+
+            public override void PostLateTick() { }
         }
 
         private sealed class CurrentStateStatus : Status
         {
             public CurrentStateStatus(State<TState, TTransition, TSignal> state) : base(state) { }
 
+            public override void FixedTick()
+            {
+                this.state.tickableActions.FixedTickables.FixedTick();
+
+                foreach (var orthogonal in this.state.OrthogonalsI.Values)
+                {
+                    orthogonal.Machine.FixedTick();
+                }
+            }
+
+            public override void PostFixedTick()
+            {
+                this.state.tickableActions.PostFixedTickables.PostFixedTick();
+
+                foreach (var orthogonal in this.state.OrthogonalsI.Values)
+                {
+                    orthogonal.Machine.PostFixedTick();
+                }
+            }
+
             public override void Tick()
             {
-                this.state.actions.Tick();
+                this.state.tickableActions.Tickables.Tick();
 
                 foreach (var orthogonal in this.state.OrthogonalsI.Values)
                 {
                     orthogonal.Machine.Tick();
+                }
+            }
+
+            public override void PostTick()
+            {
+                this.state.tickableActions.PostTickables.PostTick();
+
+                foreach (var orthogonal in this.state.OrthogonalsI.Values)
+                {
+                    orthogonal.Machine.PostTick();
+                }
+            }
+
+            public override void LateTick()
+            {
+                this.state.tickableActions.LateTickables.LateTick();
+
+                foreach (var orthogonal in this.state.OrthogonalsI.Values)
+                {
+                    orthogonal.Machine.LateTick();
+                }
+            }
+
+            public override void PostLateTick()
+            {
+                this.state.tickableActions.PostLateTickables.PostLateTick();
+
+                foreach (var orthogonal in this.state.OrthogonalsI.Values)
+                {
+                    orthogonal.Machine.PostLateTick();
                 }
             }
         }

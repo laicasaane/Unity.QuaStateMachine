@@ -4,7 +4,10 @@ using System.Linq;
 namespace QuaStateMachine
 {
     public partial class StateMachine<TState, TTransition, TSignal>
-        : IStateMachine<TState, TTransition, TSignal>
+        : IStateMachine<TState, TTransition, TSignal>,
+          IFixedTickable, IPostFixedTickable,
+          ITickable, IPostTickable,
+          ILateTickable, IPostLateTickable
     {
         public bool Initialized { get; private set; }
 
@@ -87,13 +90,20 @@ namespace QuaStateMachine
         internal Dictionary<TTransition, Transition<TState, TTransition, TSignal>> TransitionMapI { get; }
 
         private readonly StateMachineActionList actions;
+        private readonly TickableList tickableActions;
+
+        private TickType transitionTickType;
 
         public StateMachine()
         {
             this.StateMapI = new Dictionary<TState, State<TState, TTransition, TSignal>>();
             this.SignalMapI = new Dictionary<TSignal, Signal<TState, TTransition, TSignal>>();
             this.TransitionMapI = new Dictionary<TTransition, Transition<TState, TTransition, TSignal>>();
+
             this.actions = new StateMachineActionList();
+            this.tickableActions = new TickableList();
+
+            this.transitionTickType = TickType.Tick;
         }
 
         #region State Creation
@@ -181,6 +191,11 @@ namespace QuaStateMachine
 
         #region Transition Creation
 
+        public void SetTransitionTick(TickType value)
+        {
+            this.transitionTickType = value;
+        }
+
         public Transition<TState, TTransition, TSignal> CreateTransition(TTransition transitionName,
                                                                          TState startStateName, TState endStateName)
         {
@@ -210,7 +225,8 @@ namespace QuaStateMachine
             }
 
             var machine = startState.MachineI;
-            var transition = new Transition<TState, TTransition, TSignal>(machine, transitionName, startState, endState);
+            var transition = new Transition<TState, TTransition, TSignal>(machine, transitionName, startState, endState,
+                                                                          this.transitionTickType);
             machine.TransitionMapI.Add(transitionName, transition);
 
             if (machine != this)
@@ -630,6 +646,7 @@ namespace QuaStateMachine
             }
 
             this.actions.Add(action);
+            this.tickableActions.Add(action);
             return true;
         }
 
@@ -656,14 +673,64 @@ namespace QuaStateMachine
             this.actions.Terminate();
         }
 
+        public void FixedTick()
+        {
+            if (!this.Initialized)
+                return;
+
+            this.tickableActions.FixedTickables.FixedTick();
+            this.CurrentStateI?.FixedTick();
+            this.CurrentTransitionI?.FixedTick();
+        }
+
+        public void PostFixedTick()
+        {
+            if (!this.Initialized)
+                return;
+
+            this.tickableActions.PostFixedTickables.PostFixedTick();
+            this.CurrentStateI?.PostFixedTick();
+            this.CurrentTransitionI?.PostFixedTick();
+        }
+
         public void Tick()
         {
             if (!this.Initialized)
                 return;
 
-            this.actions.Tick();
+            this.tickableActions.Tickables.Tick();
             this.CurrentStateI?.Tick();
             this.CurrentTransitionI?.Tick();
+        }
+
+        public void PostTick()
+        {
+            if (!this.Initialized)
+                return;
+
+            this.tickableActions.PostTickables.PostTick();
+            this.CurrentStateI?.PostTick();
+            this.CurrentTransitionI?.PostTick();
+        }
+
+        public void LateTick()
+        {
+            if (!this.Initialized)
+                return;
+
+            this.tickableActions.LateTickables.LateTick();
+            this.CurrentStateI?.LateTick();
+            this.CurrentTransitionI?.LateTick();
+        }
+
+        public void PostLateTick()
+        {
+            if (!this.Initialized)
+                return;
+
+            this.tickableActions.PostLateTickables.PostLateTick();
+            this.CurrentStateI?.PostLateTick();
+            this.CurrentTransitionI?.PostLateTick();
         }
 
         public void EmitSignal(object signalName)

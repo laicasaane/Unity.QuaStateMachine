@@ -25,8 +25,6 @@
 
         public virtual void Start(TransitionArgs args) { }
 
-        public virtual void Tick() { }
-
         public virtual void Finish() { }
 
         protected void SetTransition(ITransition value)

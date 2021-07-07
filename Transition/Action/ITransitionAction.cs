@@ -8,8 +8,6 @@
 
         void Start(TransitionArgs args);
 
-        void Tick();
-
         void Finish();
     }
 

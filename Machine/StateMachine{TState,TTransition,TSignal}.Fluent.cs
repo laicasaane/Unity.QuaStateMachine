@@ -82,6 +82,13 @@ namespace QuaStateMachine
             return GetTransitionByName(transition.Name);
         }
 
+        public StateMachine<TState, TTransition, TSignal> TickTransition(
+            TickType value)
+        {
+            SetTransitionTick(value);
+            return this;
+        }
+
         public StateMachine<TState, TTransition, TSignal> Create(
             TState stateName, out State<TState, TTransition, TSignal> state)
         {
@@ -413,16 +420,6 @@ namespace QuaStateMachine
             return this;
         }
 
-        public StateMachine<TState, TTransition, TSignal> OnTick(
-            Action<IStateMachineAction> action)
-        {
-            if (action == null)
-                return this;
-
-            AddAction(new StateMachineActionTick(action));
-            return this;
-        }
-
         public StateMachine<TState, TTransition, TSignal> OnTerminate(
             Action<IStateMachineAction> action)
         {
@@ -460,6 +457,66 @@ namespace QuaStateMachine
                 return this;
 
             AddAction(new StateMachineActionStateChange<TState, TTransition, TSignal>(action));
+            return this;
+        }
+
+        public StateMachine<TState, TTransition, TSignal> OnFixedTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new StateMachineActionTickFixed(action));
+            return this;
+        }
+
+        public StateMachine<TState, TTransition, TSignal> OnPostFixedTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new StateMachineActionTickFixedPost(action));
+            return this;
+        }
+
+        public StateMachine<TState, TTransition, TSignal> OnTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new StateMachineActionTick(action));
+            return this;
+        }
+
+        public StateMachine<TState, TTransition, TSignal> OnPostTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new StateMachineActionTickPost(action));
+            return this;
+        }
+
+        public StateMachine<TState, TTransition, TSignal> OnLateTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new StateMachineActionTickLate(action));
+            return this;
+        }
+
+        public StateMachine<TState, TTransition, TSignal> OnPostLateTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new StateMachineActionTickLatePost(action));
             return this;
         }
     }

@@ -177,6 +177,13 @@ namespace QuaStateMachine
             return Transition(this.Machine.Begin(transition), parent);
         }
 
+        public Orthogonal<TState, TTransition, TSignal> TickTransition(
+            TickType value)
+        {
+            this.Machine.TickTransition(value);
+            return this;
+        }
+
         public Orthogonal<TState, TTransition, TSignal> Create(
             TState stateName, out State<TState, TTransition, TSignal> state)
         {
@@ -493,6 +500,66 @@ namespace QuaStateMachine
             Action<IStateMachineAction, State<TState, TTransition, TSignal>, State<TState, TTransition, TSignal>> action)
         {
             this.Machine.OnStateChange(action);
+            return this;
+        }
+
+        public Orthogonal<TState, TTransition, TSignal> OnFixedTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            this.Machine.OnFixedTick(action);
+            return this;
+        }
+
+        public Orthogonal<TState, TTransition, TSignal> OnPostFixedTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            this.Machine.OnPostFixedTick(action);
+            return this;
+        }
+
+        public Orthogonal<TState, TTransition, TSignal> OnTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            this.Machine.OnTick(action);
+            return this;
+        }
+
+        public Orthogonal<TState, TTransition, TSignal> OnPostTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            this.Machine.OnPostTick(action);
+            return this;
+        }
+
+        public Orthogonal<TState, TTransition, TSignal> OnLateTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            this.Machine.OnLateTick(action);
+            return this;
+        }
+
+        public Orthogonal<TState, TTransition, TSignal> OnPostLateTick(
+            Action<IStateMachineAction> action)
+        {
+            if (action == null)
+                return this;
+
+            this.Machine.OnPostLateTick(action);
             return this;
         }
     }

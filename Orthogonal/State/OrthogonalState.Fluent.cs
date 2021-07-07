@@ -65,6 +65,27 @@ namespace QuaStateMachine
             return this;
         }
 
+        public OrthogonalState<TState, TTransition, TSignal> OnTerminate(
+            Action<IStateAction> action)
+        {
+            this.State.OnTerminate(action);
+            return this;
+        }
+
+        public OrthogonalState<TState, TTransition, TSignal> OnFixedTick(
+            Action<IStateAction> action)
+        {
+            this.State.OnFixedTick(action);
+            return this;
+        }
+
+        public OrthogonalState<TState, TTransition, TSignal> OnPostFixedTick(
+            Action<IStateAction> action)
+        {
+            this.State.OnPostFixedTick(action);
+            return this;
+        }
+
         public OrthogonalState<TState, TTransition, TSignal> OnTick(
             Action<IStateAction> action)
         {
@@ -72,10 +93,24 @@ namespace QuaStateMachine
             return this;
         }
 
-        public OrthogonalState<TState, TTransition, TSignal> OnTerminate(
+        public OrthogonalState<TState, TTransition, TSignal> OnPostTick(
             Action<IStateAction> action)
         {
-            this.State.OnTerminate(action);
+            this.State.OnPostTick(action);
+            return this;
+        }
+
+        public OrthogonalState<TState, TTransition, TSignal> OnLateTick(
+            Action<IStateAction> action)
+        {
+            this.State.OnLateTick(action);
+            return this;
+        }
+
+        public OrthogonalState<TState, TTransition, TSignal> OnPostLateTick(
+            Action<IStateAction> action)
+        {
+            this.State.OnPostLateTick(action);
             return this;
         }
     }

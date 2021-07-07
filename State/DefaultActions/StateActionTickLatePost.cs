@@ -2,16 +2,16 @@
 
 namespace QuaStateMachine
 {
-    internal sealed class StateActionTick : DefaultStateAction, ITickable
+    internal sealed class StateActionTickLatePost : DefaultStateAction, IPostLateTickable
     {
         private readonly Action<IStateAction> action;
 
-        internal StateActionTick(Action<IStateAction> action)
+        internal StateActionTickLatePost(Action<IStateAction> action)
         {
             this.action = action ?? throw new ArgumentNullException(nameof(action));
         }
 
-        public void Tick()
+        public void PostLateTick()
         {
             this.action(this);
         }

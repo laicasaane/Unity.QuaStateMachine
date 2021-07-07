@@ -2,16 +2,16 @@
 
 namespace QuaStateMachine
 {
-    internal sealed class StateActionTick : DefaultStateAction, ITickable
+    internal sealed class StateActionTickFixed : DefaultStateAction, IFixedTickable
     {
         private readonly Action<IStateAction> action;
 
-        internal StateActionTick(Action<IStateAction> action)
+        internal StateActionTickFixed(Action<IStateAction> action)
         {
             this.action = action ?? throw new ArgumentNullException(nameof(action));
         }
 
-        public void Tick()
+        public void FixedTick()
         {
             this.action(this);
         }

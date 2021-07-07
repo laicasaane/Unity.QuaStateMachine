@@ -73,6 +73,36 @@ namespace QuaStateMachine
             return this;
         }
 
+        public State<TState, TTransition, TSignal> OnTerminate(
+            Action<IStateAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new StateActionTerminate(action));
+            return this;
+        }
+
+        public State<TState, TTransition, TSignal> OnFixedTick(
+            Action<IStateAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new StateActionTickFixed(action));
+            return this;
+        }
+
+        public State<TState, TTransition, TSignal> OnPostFixedTick(
+            Action<IStateAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new StateActionTickFixedPost(action));
+            return this;
+        }
+
         public State<TState, TTransition, TSignal> OnTick(
             Action<IStateAction> action)
         {
@@ -83,13 +113,33 @@ namespace QuaStateMachine
             return this;
         }
 
-        public State<TState, TTransition, TSignal> OnTerminate(
+        public State<TState, TTransition, TSignal> OnPostTick(
             Action<IStateAction> action)
         {
             if (action == null)
                 return this;
 
-            AddAction(new StateActionTerminate(action));
+            AddAction(new StateActionTickPost(action));
+            return this;
+        }
+
+        public State<TState, TTransition, TSignal> OnLateTick(
+            Action<IStateAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new StateActionTickLate(action));
+            return this;
+        }
+
+        public State<TState, TTransition, TSignal> OnPostLateTick(
+            Action<IStateAction> action)
+        {
+            if (action == null)
+                return this;
+
+            AddAction(new StateActionTickLatePost(action));
             return this;
         }
     }

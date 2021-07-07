@@ -8,8 +8,6 @@
 
         void StateChange(IState former, IState current);
 
-        void Tick();
-
         void Terminate();
     }
 

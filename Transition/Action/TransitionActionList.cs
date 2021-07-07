@@ -26,14 +26,6 @@ namespace QuaStateMachine
             }
         }
 
-        internal void Tick()
-        {
-            for (var i = 0; i < this.Count; i++)
-            {
-                this[i].Tick();
-            }
-        }
-
         internal void Finish()
         {
             for (var i = 0; i < this.Count; i++)

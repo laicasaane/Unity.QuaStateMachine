@@ -12,8 +12,6 @@
 
         void Exit(IState next);
 
-        void Tick();
-
         void Terminate();
     }
 

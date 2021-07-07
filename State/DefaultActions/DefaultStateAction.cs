@@ -29,8 +29,6 @@
 
         public virtual void Exit(IState next) { }
 
-        public virtual void Tick() { }
-
         public virtual void Terminate() { }
 
         protected void SetState(IState state)

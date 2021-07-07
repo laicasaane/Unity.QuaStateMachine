@@ -30,8 +30,6 @@ namespace QuaStateMachine
 
         void Terminate();
 
-        void Tick();
-
         void EmitSignal(object signalName);
     }
 }

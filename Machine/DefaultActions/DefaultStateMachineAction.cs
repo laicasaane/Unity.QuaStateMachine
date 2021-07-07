@@ -14,8 +14,6 @@
 
         public virtual void StateChange(IState former, IState current) { }
 
-        public virtual void Tick() { }
-
         public virtual void Terminate() { }
 
         protected void SetMachine(IStateMachine machine)
